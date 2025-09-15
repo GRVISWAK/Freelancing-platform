@@ -15,17 +15,19 @@ public class Freelancer {
     @Column(unique = true)
     public String email;
     public String password;
+    @Column(name = "wallet_address")
+    public String walletAddress;
     public String skills;
     public String portfoliourl;
-    public Freelancer() {
-    }
-    public Freelancer(int id, String name, String email, String password, String skills, String portfoliourl) {
+    public Freelancer() {}
+    public Freelancer(int id, String name, String email, String password, String skills, String portfoliourl, String walletAddress) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.skills = skills;
         this.portfoliourl = portfoliourl;
+        this.walletAddress = walletAddress;
     }
     public int getId() {
         return id;
@@ -63,5 +65,10 @@ public class Freelancer {
     public void setportfoliourl(String portfoliourl) {
         this.portfoliourl = portfoliourl;
     }
-
+    public String getWalletAddress() {
+        return walletAddress;
+    }
+    public void setWalletAddress(String walletAddress) {
+        this.walletAddress = walletAddress;
+    }
 }

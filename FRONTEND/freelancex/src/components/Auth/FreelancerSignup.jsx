@@ -79,16 +79,18 @@ const FreelancerSignup = () => {
     password: '',
     skills: '',
     portfoliourl: '',
+    walletAddress: '', // changed from wallet
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUser({ ...user, [name]: value });
+    // Map 'wallet' input to 'walletAddress' in state
+    setUser({ ...user, [name === 'wallet' ? 'walletAddress' : name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!user.name || !user.email || !user.password || !user.skills || !user.portfoliourl) {
+    if (!user.name || !user.email || !user.password || !user.skills || !user.portfoliourl || !user.walletAddress) {
       toast.warn('All fields are required.');
       setValid(false);
       return;
@@ -173,6 +175,16 @@ const FreelancerSignup = () => {
               name="portfoliourl"
               type="url"
               value={user.portfoliourl}
+              onChange={handleChange}
+              margin="normal"
+              variant="outlined"
+            />
+            <TextField
+              required
+              fullWidth
+              label="Wallet Address"
+              name="wallet"
+              value={user.walletAddress}
               onChange={handleChange}
               margin="normal"
               variant="outlined"

@@ -1,5 +1,8 @@
 package com.freelancex.controller;
 
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +23,13 @@ public class FreelancerController {
     
     @Autowired
     private FreelancerRepo repo;
-    
+    @GetMapping("/getWalletAddress")
+    public Map<String, String> getWalletAddress(@RequestParam int freelancerId) {
+    Optional<Freelancer> freelancer = repo.findById(freelancerId);
+    String wallet = freelancer.map(Freelancer::getWalletAddress).orElse("Wallet address not found");
+    return Map.of("walletAddress", wallet);
+    }
+
     @PostMapping("/newuser")
     boolean newuser(@RequestBody Freelancer freelancer){
         Freelancer f = repo.findUserByEmail(freelancer.email);

@@ -12,8 +12,6 @@ import com.freelancex.model.Project;
 @Repository
 public interface ProjectRepo extends JpaRepository<Project,Integer> {
     List<Project> findByClientId(int clientId);
-    
-
     @Query(value = "SELECT p FROM Project p WHERE p.status='open'")
     public List<Project> openProjects();
 }

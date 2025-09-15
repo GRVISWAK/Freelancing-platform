@@ -15,17 +15,17 @@ public class Client {
     @Column(unique = true)
     public String email;
     public String password;
+    @Column(name = "wallet_address")
+    public String walletAddress;
     public String companyname;
-    public String industryname;
-    public Client() {
-    }
-    public Client(int id, String name, String email, String password, String companyname, String industryname) {
+    public Client() {}
+    public Client(int id, String name, String email, String password, String companyname, String walletAddress) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.companyname = companyname;
-        this.industryname = industryname;
+        this.walletAddress = walletAddress;
     }
     public int getId() {
         return id;
@@ -57,11 +57,10 @@ public class Client {
     public void setCompanyname(String companyname) {
         this.companyname = companyname;
     }
-    public String getIndustryname() {
-        return industryname;
+    public String getWalletAddress() {
+        return walletAddress;
     }
-    public void setIndustryname(String industryname) {
-        this.industryname = industryname;
+    public void setWalletAddress(String walletAddress) {
+        this.walletAddress = walletAddress;
     }
-    
 }

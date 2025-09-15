@@ -14,19 +14,20 @@ const ClientSignup = () => {
     email: '',
     password: '',
     companyname: '',
-    industryname: '',
+    walletAddress: '', // changed from wallet
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUser({ ...user, [name]: value });
+    // Map 'wallet' input to 'walletAddress' in state
+    setUser({ ...user, [name === 'wallet' ? 'walletAddress' : name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Validate all required fields are filled
-    if (!user.name || !user.email || !user.password || !user.companyname || !user.industryname) {
+    if (!user.name || !user.email || !user.password || !user.companyname || !user.walletAddress) {
       toast.warn('All fields are required.');
       return;
     }
@@ -107,12 +108,13 @@ const ClientSignup = () => {
               margin="normal"
               variant="outlined"
             />
+
             <TextField
               required
               fullWidth
-              label="Industry Name"
-              name="industryname"
-              value={user.industryname}
+              label="Wallet Address"
+              name="wallet"
+              value={user.walletAddress}
               onChange={handleChange}
               margin="normal"
               variant="outlined"

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './ProposalsDialog.css';
 import axios from 'axios';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
-import { initializeWeb3, getClientAddress, getFreelancerAddress, completeWork, releaseFunds, depositFunds, getContractBalance } from './Web3Config';
+import { initializeWeb3, getClientAddress, getFreelancerAddress, createEscrowContract, isValidEthAddress, completeWork, releaseFunds, depositFunds, getContractBalance } from './Web3Config';
+import Userservice from '../../services/Userservice';
 
 
 const ProposalsDialog = ({ projectId, open, onClose }) => {
@@ -15,23 +16,8 @@ const ProposalsDialog = ({ projectId, open, onClose }) => {
   const [clientAddress, setClientAddress] = useState('');
    const [freelancerAddress, setFreelancerAddress] = useState('');
 
-   useEffect(() => {
-    async function fetchAddresses() {
-       try {
-          setStatus('Fetching addresses...');
-          await initializeWeb3();
-          const client = await getClientAddress();
-          const freelancer = await getFreelancerAddress();
-          setClientAddress(client);
-          setFreelancerAddress(freelancer);
-          setStatus('Addresses loaded successfully');
-       } catch (error) {
-          console.error('Error fetching addresses:', error);
-          setStatus('Failed to load addresses');
-       }
-    }
-    fetchAddresses();
- }, []);
+
+   // Removed fetchAddresses useEffect: do not fetch contract addresses before contract is deployed
 
   useEffect(() => {
     if (open) {
@@ -74,15 +60,39 @@ const ProposalsDialog = ({ projectId, open, onClose }) => {
     setLoading(false);
   };
 
-  const handleAccept = async (proposalId) => {
+  // Accept proposal: deploy escrow contract and update backend
+  const handleAccept = async (freelancerId) => {
     try {
-      // Send a request to accept the proposal
-      // await axios.post(`http://localhost:8080/request/proposals/${proposalId}/accept`);
-      handleDeposit();
-      alert(`Proposal accepted successfully! ${clientAddress}`);
-      fetchProposals(); // Refresh the proposals list
+      // Fetch freelancer wallet address from backend
+      const freelancerRes = await axios.get(`http://localhost:8080/freelancer/getWalletAddress`, { params: { freelancerId } });
+      const freelancerWallet = freelancerRes.data.walletAddress;
+
+      // Fetch client wallet address from backend (project details)
+      const projectRes = await axios.get(`http://localhost:8080/project/getProjectDetails`, { params: { projectId } });
+      // Try both camelCase and snake_case for compatibility
+      const clientWallet = projectRes.data.clientWallet || projectRes.data.client_wallet;
+
+      // Debug log the addresses
+      console.log('clientWallet:', clientWallet, 'freelancerWallet:', freelancerWallet);
+
+      if (!isValidEthAddress(clientWallet) || !isValidEthAddress(freelancerWallet)) {
+        alert(`Invalid client or freelancer wallet address.\nclientWallet: ${clientWallet}\nfreelancerWallet: ${freelancerWallet}`);
+        return;
+      }
+      // Deploy escrow contract directly using Ganache account
+      await initializeWeb3();
+      const escrowAddress = await createEscrowContract(clientWallet, freelancerWallet);
+      // Update backend with escrow address and freelancer wallet
+      
+      
+
+
+      
+      alert(`Proposal accepted and escrow contract deployed! Escrow: ${escrowAddress}`);
+      fetchProposals();
     } catch (error) {
-      console.error("Error accepting proposal:", error);
+      console.error('Error accepting proposal:', error);
+      alert('Failed to accept proposal or deploy escrow.');
     }
   };
 

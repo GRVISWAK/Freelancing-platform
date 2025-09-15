@@ -1,4 +1,5 @@
-import React, { useContext, useState ,useEffect} from 'react';
+import React, { useContext, useState ,useEffect } from 'react';
+// import { createEscrowContract } from './Web3Config';
 import './NewProject.css';
 import { Button, CircularProgress } from '@mui/material';
 import { Usercontext } from '../../Usercontext';
@@ -14,14 +15,14 @@ const [project, setProject] = useState({
   clientId: user.id,     
   title: '',
   description: '',
-  min_budget: 0,                 
-  max_budget: 0,
+  minBudget: 0,                 
+  maxBudget: 0,
   status: 'Open',                
   category: '',
   deadline: '',                  
-  skills_required: '',           
-  client_wallet: '',
-  escrow_amount: 0,              
+  skillsRequired: '',           
+  escrowAddress: '', // new field
+  escrowAmount: 0,              
   currency: 'USD'                
 });
 useEffect(() => {
@@ -38,37 +39,45 @@ useEffect(() => {
     setProject({ ...project, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(user);
-    if (!project.title || !project.description || !project.min_budget || !project.max_budget || !project.category ||!project.deadline ||!project.skills_required ||!project.client_wallet||!project.escrow_amount||!project.currency) {
+    if (!project.title || !project.description || !project.minBudget || !project.maxBudget || !project.category ||!project.deadline ||!project.skillsRequired || !project.escrowAmount || !project.currency) {
       toast.warn('All fields are required.');
       setValid(false);
       return;
     }
     try {
       setLoading(true);
-      setTimeout(async () => {
-        // setProject({...project,clientId:user.id});
-        console.log(user);
-        console.log(project);
-        let response = await Userservice.newproject(project);
-        console.log(response);
+      // Debug: print user object
+      console.log('user:', user);
+      if (!user.walletAddress) {
+        toast.error('Wallet address is missing. Please log in again.');
         setLoading(false);
-        if(response.data) {
-          setLoading(false);
-          toast.success('Project / Job posted successfully!', {autoClose: 500,});
-          setTimeout(()=>{
-            navigate("/cdashboard");
-          },2000);
-        }
-        else
-          toast.error('Error.');
-      },2000);
+        return;
+      }
+      // Only send project data, escrow contract will be deployed after proposal acceptance
+      const projectWithClient = {
+        ...project,
+        escrowAddress: '',
+        clientWallet: user.walletAddress, // camelCase for backend setter
+        freelancerWallet: null // camelCase for backend setter
+      };
+      console.log('Client wallet address:', user.walletAddress);
+      console.log('projectWithClient:', projectWithClient);
+      let response = await Userservice.newproject(projectWithClient);
+      setLoading(false);
+      if(response.data) {
+        toast.success('Project / Job posted successfully!', {autoClose: 500,});
+        setTimeout(()=>{
+          navigate("/cdashboard");
+        },2000);
+      } else {
+        toast.error('Error.');
+      }
     } catch (error) {
       console.log(error);
       setLoading(false);
-      toast.error('An error occurred during account creation.');
+      toast.error('An error occurred during project creation.');
     }
   };
 
@@ -102,9 +111,9 @@ useEffect(() => {
         <label>Minimum Budget</label>
         <input
           type="number"
-          name="min_budget"
-          value={project.min_budget}
-          onChange={handleChange}
+        name="minBudget"
+        value={project.minBudget}
+        onChange={handleChange}
           step="0.01"
           required
         />
@@ -114,9 +123,9 @@ useEffect(() => {
         <label>Maximum Budget</label>
         <input
           type="number"
-          name="max_budget"
-          value={project.max_budget}
-          onChange={handleChange}
+        name="maxBudget"
+        value={project.maxBudget}
+        onChange={handleChange}
           step="0.01"
           required
         />
@@ -158,33 +167,20 @@ useEffect(() => {
         <label>Skills Required</label>
         <input
           type="text"
-          name="skills_required"
-          value={project.skills_required}
-          onChange={handleChange}
+        name="skillsRequired"
+        value={project.skillsRequired}
+        onChange={handleChange}
           placeholder="e.g., React, Node.js, Python"
         />
       </div>
 
       <div>
-        <label>Client Wallet Address</label>
-        <input
-          type="text"
-          name="client_wallet"
-          value={project.client_wallet}
-          onChange={handleChange}
-          required
-        />
-      </div>
-
-      
-
-      <div>
         <label>Escrow Amount</label>
         <input
           type="number"
-          name="escrow_amount"
-          value={project.escrow_amount}
-          onChange={handleChange}
+        name="escrowAmount"
+        value={project.escrowAmount}
+        onChange={handleChange}
           step="0.01"
           required
         />

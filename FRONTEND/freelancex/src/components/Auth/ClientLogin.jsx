@@ -27,16 +27,22 @@ const ClientLogin = () => {
         console.log(response);
         setLoading(false);
         if(response.data) {
-          setUser({id:response.data.id,name:response.data.name,email:response.data.email,password:response.data.password,role:'client'});
+          setUser({
+            id: response.data.id,
+            name: response.data.name,
+            email: response.data.email,
+            password: response.data.password,
+            role: 'client',
+            walletAddress: response.data.walletAddress // ensure this is returned by backend
+          });
 
           toast.success('Login Successful.', {autoClose: 500,});
           setTimeout(()=>{
             navigate("/cdashboard");
-            
           },2000);
-        }
-        else
+        } else {
           toast.error('Username or Password Incorrect.');
+        }
       },2000);
     } catch (error) {
       console.log(error);

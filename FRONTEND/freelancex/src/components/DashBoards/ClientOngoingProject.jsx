@@ -1,61 +1,75 @@
 import { Button } from '@mui/material';
-import { initializeWeb3, getClientAddress, getFreelancerAddress, completeWork, releaseFunds, depositFunds, getContractBalance } from './Web3Config';
+import { initializeWeb3, completeWork, releaseFunds, depositFunds, getContractBalance } from './Web3Config';
 import React, { useState, useEffect } from 'react';
 
-
 const ClientOngoingProject = ({ project }) => {
-    const [clientAddress, setClientAddress] = useState('');
-   const [freelancerAddress, setFreelancerAddress] = useState('');
-   const [status, setStatus] = useState('Loading...');
-   const [isLoading, setIsLoading] = useState(false);
-   const [balance, setBalance] = useState('0');
+  const [status, setStatus] = useState('Loading...');
+  const [isLoading, setIsLoading] = useState(false);
+  const [balance, setBalance] = useState('0');
+  const [depositAmount, setDepositAmount] = useState('');
 
-   useEffect(() => {
-      async function fetchAddresses() {
-         try {
-            setStatus('Fetching addresses...');
-            await initializeWeb3();
-            const client = await getClientAddress();
-            const freelancer = await getFreelancerAddress();
-            setClientAddress(client);
-            setFreelancerAddress(freelancer);
-            setStatus('Addresses loaded successfully');
-         } catch (error) {
-            console.error('Error fetching addresses:', error);
-            setStatus('Failed to load addresses');
-         }
+  // Always use addresses from project prop, try both camelCase and snake_case for compatibility
+  const escrowAddress = project.escrowAddress || project.escrow_address;
+  const clientAddress = project.clientWallet || project.client_wallet;
+  const freelancerAddress = project.freelancerWallet || project.freelancer_wallet;
+
+  useEffect(() => {
+    async function fetchBalance() {
+      try {
+        setStatus('Fetching contract balance...');
+        await initializeWeb3();
+        const bal = await getContractBalance(escrowAddress);
+        setBalance(bal);
+        setStatus('Balance loaded');
+      } catch (error) {
+        console.error('Error fetching balance:', error);
+        setStatus('Failed to load balance');
       }
-      fetchAddresses();
-   }, []);
+    }
+    if (escrowAddress) fetchBalance();
+  }, [escrowAddress]);
 
-    const handleCompleteWork = async () => {
-        setIsLoading(true);
-        setStatus('Completing work...');
-        try {
-        await completeWork(clientAddress);
-        setStatus('Work completed');
-        } catch (error) {
-        console.error('Error completing work:', error);
-        setStatus('Failed to complete work');
-        }
-        setIsLoading(false);
-    };
-    const handleReleaseFunds = async () => {
-        try {
-           await releaseFunds(clientAddress);
-           alert(`Funds released successfully to ${freelancerAddress}`);
-        //    alert(`Funds released successfully from ${clientAddress} to ${freelancerAddress}`);
-        } catch (error) {
-           console.error("Failed to release funds", error);
-        }
-        
-        alert(`Funds released successfully to ${freelancerAddress}`);
-        const balance = await getContractBalance();
-        console.log("Contract Balance:", balance, "ETH");
-        setBalance(balance);
-     };
-     
-    
+  const handleCompleteWork = async () => {
+    setIsLoading(true);
+    setStatus('Completing work...');
+    try {
+      await completeWork(escrowAddress, clientAddress);
+      setStatus('Work completed');
+    } catch (error) {
+      console.error('Error completing work:', error);
+      setStatus('Failed to complete work');
+    }
+    setIsLoading(false);
+  };
+
+  const handleReleaseFunds = async () => {
+    if (!freelancerAddress) {
+      alert('No freelancer assigned yet. Cannot release funds.');
+      return;
+    }
+    try {
+      await releaseFunds(escrowAddress, clientAddress);
+      alert(`Funds released successfully to ${freelancerAddress}`);
+    } catch (error) {
+      console.error('Failed to release funds', error);
+      setStatus('Failed to release funds');
+    }
+    const bal = await getContractBalance(escrowAddress);
+    setBalance(bal);
+  };
+
+  const handleDepositFunds = async () => {
+    try {
+      await depositFunds(escrowAddress, clientAddress, depositAmount);
+      alert(`Deposited ${depositAmount} ETH to contract!`);
+      const bal = await getContractBalance(escrowAddress);
+      setBalance(bal);
+    } catch (error) {
+      alert('Deposit failed: ' + error.message);
+      setStatus('Deposit failed');
+    }
+  };
+
   return (
     <div className="main">
       <div className="project-card">
@@ -64,10 +78,33 @@ const ClientOngoingProject = ({ project }) => {
         <p><strong>Budget:</strong> {project.currency} {project.min_budget} - {project.max_budget}</p>
         <p><strong>Category:</strong> {project.category}</p>
         <p><strong>Deadline:</strong> {project.deadline}</p>
-        <Button color='primary' variant='contained' onClick={handleReleaseFunds}>ReleaseFund</Button>
+        <div style={{ margin: '10px 0' }}>
+          <input
+            type="number"
+            min="0"
+            step="any"
+            placeholder="Amount in ETH"
+            value={depositAmount}
+            onChange={e => setDepositAmount(e.target.value)}
+            style={{ marginRight: '10px', padding: '5px' }}
+          />
+          <Button color='secondary' variant='contained' onClick={handleDepositFunds} disabled={!depositAmount}>
+            Deposit Funds
+          </Button>
         </div>
-        </div>
+        <Button color='primary' variant='contained' onClick={handleReleaseFunds} style={{marginTop:'10px'}} disabled={!freelancerAddress}>
+          Release Funds
+        </Button>
+        {!freelancerAddress && (
+          <div style={{color:'red',marginTop:'10px'}}>No freelancer assigned yet.</div>
+        )}
+        {freelancerAddress && (
+          <div style={{color:'green',marginTop:'10px'}}>Freelancer assigned: {freelancerAddress}</div>
+        )}
+        <div style={{marginTop:'10px'}}>Contract Balance: {balance} ETH</div>
+        <div style={{marginTop:'10px', color: 'gray', fontSize: '0.9em'}}>{status}</div>
+      </div>
+    </div>
   )
 }
-
 export default ClientOngoingProject;

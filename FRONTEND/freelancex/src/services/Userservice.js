@@ -6,7 +6,21 @@ const API_URL_CL = "http://localhost:8080/client";
 const API_URL_P = "http://localhost:8080/project";
 const API_URL_R = "http://localhost:8080/request";
 class Userservice {
-    
+    // Update project with escrow address and freelancer wallet after proposal acceptance
+    async updateProjectEscrow({ projectId, escrowAddress, freelancerWallet }) {
+        try {
+            // The backend expects projectId, escrowAddress, and freelancerWallet (all camelCase)
+            const response = await axios.post(API_URL_P + "/updateEscrow", {
+                projectId,
+                escrowAddress,
+                freelancerWallet
+            });
+            return response;
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+    }
     async newuser(user){
         try{
             const response = await axios.post(API_URL_FL + "/newuser",user);
@@ -49,7 +63,9 @@ class Userservice {
     }
     async newproject(project){
         try{
-            const response = await axios.post(API_URL_P + "/newproject",project);
+            const response = await axios.post(API_URL_P + "/newproject", project, {
+                headers: { 'Content-Type': 'application/json' }
+            });
             return response;
         }catch(error){
             console.log(error);

@@ -6,28 +6,13 @@ import { initializeWeb3, getClientAddress, getFreelancerAddress, completeWork, r
 
 const FreelancerOngoingProject = ({project}) => {
     const [clientAddress, setClientAddress] = useState('');
-   const [freelancerAddress, setFreelancerAddress] = useState('');
-   const [status, setStatus] = useState('Loading...');
-   const [isLoading, setIsLoading] = useState(false);
-   const [balance, setBalance] = useState('0');
+    // Use both camelCase and snake_case for compatibility
+    const freelancerAddress = project.freelancerWallet || project.freelancer_wallet || '';
+    const [status, setStatus] = useState('Loading...');
+    const [isLoading, setIsLoading] = useState(false);
+    const [balance, setBalance] = useState('0');
 
-   useEffect(() => {
-      async function fetchAddresses() {
-         try {
-            setStatus('Fetching addresses...');
-            await initializeWeb3();
-            const client = await getClientAddress();
-            const freelancer = await getFreelancerAddress();
-            setClientAddress(client);
-            setFreelancerAddress(freelancer);
-            setStatus('Addresses loaded successfully');
-         } catch (error) {
-            console.error('Error fetching addresses:', error);
-            setStatus('Failed to load addresses');
-         }
-      }
-      fetchAddresses();
-   }, []);
+    // No need to fetch addresses from contract, use project prop
 
    const handleCompleteWork = async () => {
       setIsLoading(true);
@@ -50,6 +35,11 @@ const FreelancerOngoingProject = ({project}) => {
           <p><strong>Category:</strong> {project.category}</p>
           <p><strong>Deadline:</strong> {project.deadline}</p>
           <p><strong>Required Skills:</strong> {project.skills_required}</p>
+          {freelancerAddress ? (
+            <p style={{color:'green'}}><strong>Freelancer Wallet:</strong> {freelancerAddress}</p>
+          ) : (
+            <p style={{color:'red'}}>No freelancer assigned yet.</p>
+          )}
           <Button color='primary' variant='contained' onClick={handleCompleteWork}>Complete work</Button>
         </div>
       );

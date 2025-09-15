@@ -1,161 +1,115 @@
 package com.freelancex.model;
-
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Column;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public int id;
-    @Column(name = "clientId")
-    public int clientId;
-    public String title;
-    public String description;
-    public float min_budget;
-    public float max_budget;
-    public String status;
-    public String category;
-    public String deadline;
-    public String skills_required;
-    public String client_wallet;
-    public float escrow_amount;
-    public String created_at;
-    public String updated_at;
-    public String milestones;
-    public float reputation_score;
-    public String currency;
-    public Project() {
-    }
-    public Project(int id, int clientId, String title, String description, float min_budget, float max_budget, String status,
-            String category, String deadline, String skills_required, String client_wallet,
-            float escrow_amount, String created_at, String updated_at, String milestones, float reputation_score,
-            String currency) {
-        this.id = id;
-        this.clientId = clientId;
-        this.title = title;
-        this.description = description;
-        this.min_budget = min_budget;
-        this.max_budget = max_budget;
-        this.status = status;
-        this.category = category;
-        this.deadline = deadline;
-        this.skills_required = skills_required;
-        this.client_wallet = client_wallet;
-        this.escrow_amount = escrow_amount;
-        this.created_at = created_at;
-        this.updated_at = updated_at;
-        this.milestones = milestones;
-        this.reputation_score = reputation_score;
-        this.currency = currency;
-    }
-    public int getId() {
-        return id;
-    }
-    public void setId(int id) {
-        this.id = id;
-    }
-    public int getClientId() {
-        return clientId;
-    }
-    public void setClientId(int clientId) {
-        this.clientId = clientId;
-    }
-    public String getTitle() {
-        return title;
-    }
-    public void setTitle(String title) {
-        this.title = title;
-    }
-    public String getdescription() {
-        return description;
-    }
-    public void setdescription(String description) {
-        this.description = description;
-    }
-    public float getMin_budget() {
-        return min_budget;
-    }
-    public void setMin_budget(float min_budget) {
-        this.min_budget = min_budget;
-    }
-    public float getMax_budget() {
-        return max_budget;
-    }
-    public void setMax_budget(float max_budget) {
-        this.max_budget = max_budget;
-    }
-    public String getStatus() {
-        return status;
-    }
-    public void setStatus(String status) {
-        this.status = status;
-    }
-    public String getCategory() {
-        return category;
-    }
-    public void setCategory(String category) {
-        this.category = category;
-    }
-    public String getDeadline() {
-        return deadline;
-    }
-    public void setDeadline(String deadline) {
-        this.deadline = deadline;
-    }
-    public String getSkills_required() {
-        return skills_required;
-    }
-    public void setSkills_required(String skills_required) {
-        this.skills_required = skills_required;
-    }
-    public String getClient_wallet() {
-        return client_wallet;
-    }
-    public void setClient_wallet(String client_wallet) {
-        this.client_wallet = client_wallet;
-    }
-    public float getEscrow_amount() {
-        return escrow_amount;
-    }
-    public void setEscrow_amount(float escrow_amount) {
-        this.escrow_amount = escrow_amount;
-    }
-    public String getCreated_at() {
-        return created_at;
-    }
-    public void setCreated_at(String created_at) {
-        this.created_at = created_at;
-    }
-    public String getUpdated_at() {
-        return updated_at;
-    }
-    public void setUpdated_at(String updated_at) {
-        this.updated_at = updated_at;
-    }
-    public String getMilestones() {
-        return milestones;
-    }
-    public void setMilestones(String milestones) {
-        this.milestones = milestones;
-    }
-    public float getReputation_score() {
-        return reputation_score;
-    }
-    public void setReputation_score(float reputation_score) {
-        this.reputation_score = reputation_score;
-    }
-    public String getCurrency() {
-        return currency;
-    }
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
-    
-    
-    
+    private int id;
+    @Column(name = "client_id")
+    private int clientId;
+
+    @Column(name = "title")
+    private String title;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "min_budget")
+    private float minBudget;
+
+    @Column(name = "max_budget")
+    private float maxBudget;
+
+    @Column(name = "status")
+    private String status;
+
+    @Column(name = "category")
+    private String category;
+
+    @Column(name = "deadline")
+    private String deadline;
+
+    @Column(name = "skills_required")
+    private String skillsRequired;
+
+    @Column(name = "escrow_amount")
+    private float escrowAmount;
+
+
+    @JsonProperty("escrowAddress")
+    @Column(name = "escrow_address")
+    private String escrowAddress;
+
+    @JsonProperty("freelancerWallet")
+    @Column(name = "freelancer_wallet")
+    private String freelancerWallet;
+
+    @JsonProperty("clientWallet")
+    @Column(name = "client_wallet")
+    private String clientWallet;
+
+    @Column(name = "currency")
+    private String currency;
+
+    @Column(name = "freelancer_id")
+    private Integer freelancerId; // nullable
+
+    public Project() {}
+
+
+    public String getEscrowAddress() { return escrowAddress; }
+    public void setEscrowAddress(String escrowAddress) { this.escrowAddress = escrowAddress; }
+
+    public String getFreelancerWallet() { return freelancerWallet; }
+    public void setFreelancerWallet(String freelancerWallet) { this.freelancerWallet = freelancerWallet; }
+
+    public String getClientWallet() { return clientWallet; }
+    public void setClientWallet(String clientWallet) { this.clientWallet = clientWallet; }
+
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
+    public int getClientId() { return clientId; }
+    public void setClientId(int clientId) { this.clientId = clientId; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public float getMinBudget() { return minBudget; }
+    public void setMinBudget(float minBudget) { this.minBudget = minBudget; }
+
+    public float getMaxBudget() { return maxBudget; }
+    public void setMaxBudget(float maxBudget) { this.maxBudget = maxBudget; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+
+    public String getDeadline() { return deadline; }
+    public void setDeadline(String deadline) { this.deadline = deadline; }
+
+    public String getSkillsRequired() { return skillsRequired; }
+    public void setSkillsRequired(String skillsRequired) { this.skillsRequired = skillsRequired; }
+
+    public float getEscrowAmount() { return escrowAmount; }
+    public void setEscrowAmount(float escrowAmount) { this.escrowAmount = escrowAmount; }
+
+    public String getCurrency() { return currency; }
+    public void setCurrency(String currency) { this.currency = currency; }
+
+    public Integer getFreelancerId() { return freelancerId; }
+    public void setFreelancerId(Integer freelancerId) { this.freelancerId = freelancerId; }
 }

@@ -49,6 +49,33 @@ public class ProjectController {
     public Optional<Project> getProjectDetails(@RequestParam int projectId) {
         return repo.findById(projectId);
     }
-
     
+    // Add/update escrow address and freelancer wallet for a project
+    @PostMapping("/updateEscrow")
+    public String updateEscrow(@RequestBody EscrowUpdateRequest request) {
+        Optional<Project> projectOpt = repo.findById(request.getProjectId());
+        if (projectOpt.isPresent()) {
+            Project project = projectOpt.get();
+            project.setEscrowAddress(request.getEscrowAddress());
+            project.setFreelancerWallet(request.getFreelancerWallet());
+            repo.save(project);
+            return "Escrow updated successfully";
+        } else {
+            return "Project not found";
+        }
+    }
+}
+
+// DTO for updateEscrow
+class EscrowUpdateRequest {
+    private int projectId;
+    private String escrowAddress;
+    private String freelancerWallet;
+
+    public int getProjectId() { return projectId; }
+    public void setProjectId(int projectId) { this.projectId = projectId; }
+    public String getEscrowAddress() { return escrowAddress; }
+    public void setEscrowAddress(String escrowAddress) { this.escrowAddress = escrowAddress; }
+    public String getFreelancerWallet() { return freelancerWallet; }
+    public void setFreelancerWallet(String freelancerWallet) { this.freelancerWallet = freelancerWallet; }
 }

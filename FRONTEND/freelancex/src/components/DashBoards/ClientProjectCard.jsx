@@ -19,6 +19,12 @@ const ClientProjectCard = ({ project }) => {
         <p><strong>Category:</strong> {project.category}</p>
         <p><strong>Deadline:</strong> {project.deadline}</p>
         <p><strong>Status:</strong> {project.status}</p>
+        {project.client_wallet && (
+          <p><strong>Client Wallet:</strong> {project.client_wallet}</p>
+        )}
+        {project.freelancer_wallet && (
+          <p><strong>Freelancer Wallet:</strong> {project.freelancer_wallet}</p>
+        )}
         <div className="card-buttons">
           <Link to={`/editproject/${project.id}`}>
             <Button variant="contained" color="primary">Edit</Button>
