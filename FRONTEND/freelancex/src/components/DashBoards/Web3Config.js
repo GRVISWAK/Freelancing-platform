@@ -6,7 +6,7 @@ let web3;
 let account;
 let escrowContract;
 // Update to the latest deployed EscrowFactory contract address from your migration logs
-const factoryAddress = "0x620549caEE7999AAa7107b3cd85EdD2fD8767047";
+const factoryAddress = "0xD9725521bb9A2bdBE3CFafA75Ef3e8616Dd2Ea83";
 let escrowFactory;
 
 
@@ -115,6 +115,7 @@ export const getFreelancerAddress = async (escrowAddress) => {
     return await contract.methods.freelancer().call();
 };
 
+// Example
 export const completeWork = async (escrowAddress, fromAddress) => {
     const contract = getEscrowInstance(escrowAddress);
     await contract.methods.completeWork().send({ from: fromAddress });

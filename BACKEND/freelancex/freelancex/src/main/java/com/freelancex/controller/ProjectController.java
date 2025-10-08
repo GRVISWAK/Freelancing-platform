@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,6 +65,17 @@ public class ProjectController {
             return "Project not found";
         }
     }
+
+    @PostMapping("/assignFreelancer")
+    public ResponseEntity<?> assignFreelancer(@RequestBody AssignFreelancerRequest req) {
+        Project project = repo.findById(req.getProjectId()).orElse(null);
+        if (project == null) return ResponseEntity.badRequest().body("Project not found");
+        project.setFreelancerId(req.getFreelancerId());
+        project.setFreelancerWallet(req.getFreelancerWallet());
+        project.setEscrowAddress(req.getEscrowAddress());
+        repo.save(project);
+        return ResponseEntity.ok("Project updated");
+    }
 }
 
 // DTO for updateEscrow
@@ -74,6 +86,23 @@ class EscrowUpdateRequest {
 
     public int getProjectId() { return projectId; }
     public void setProjectId(int projectId) { this.projectId = projectId; }
+    public String getEscrowAddress() { return escrowAddress; }
+    public void setEscrowAddress(String escrowAddress) { this.escrowAddress = escrowAddress; }
+    public String getFreelancerWallet() { return freelancerWallet; }
+    public void setFreelancerWallet(String freelancerWallet) { this.freelancerWallet = freelancerWallet; }
+}
+
+// DTO for assignFreelancer
+class AssignFreelancerRequest {
+    private int projectId;
+    private int freelancerId;
+    private String escrowAddress;
+    private String freelancerWallet;
+
+    public int getProjectId() { return projectId; }
+    public void setProjectId(int projectId) { this.projectId = projectId; }
+    public int getFreelancerId() { return freelancerId; }
+    public void setFreelancerId(int freelancerId) { this.freelancerId = freelancerId; }
     public String getEscrowAddress() { return escrowAddress; }
     public void setEscrowAddress(String escrowAddress) { this.escrowAddress = escrowAddress; }
     public String getFreelancerWallet() { return freelancerWallet; }

@@ -82,11 +82,14 @@ const ProposalsDialog = ({ projectId, open, onClose }) => {
       // Deploy escrow contract directly using Ganache account
       await initializeWeb3();
       const escrowAddress = await createEscrowContract(clientWallet, freelancerWallet);
-      // Update backend with escrow address and freelancer wallet
-      
-      
 
-
+      // Update backend with escrow address and freelancer info
+      await axios.post('http://localhost:8080/project/assignFreelancer', {
+        projectId,
+        freelancerId,
+        freelancerWallet,
+        escrowAddress
+      });
       
       alert(`Proposal accepted and escrow contract deployed! Escrow: ${escrowAddress}`);
       fetchProposals();

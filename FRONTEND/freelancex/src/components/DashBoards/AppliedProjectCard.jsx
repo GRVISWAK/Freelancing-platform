@@ -2,6 +2,9 @@ import React from "react";
 import "./AppliedProjectCard.css";
 
 const AppliedProjectCard = ({ project }) => {
+  if (!project) {
+    return null; // Don't render anything for null/undefined projects
+}
   return (
     <div className="applied-project-card">
       <h4>{project.title}</h4>
